@@ -1,5 +1,10 @@
 export ZSH="${HOME}/.oh-my-zsh"
 
+if [ ! -d "${ZSH}" ]; then
+  echo "Oh My Zsh is not installed! Running the installer script..."
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
 # Update automatically without confirmation. Other modes are:
 # - reminder: Post a reminder every time the shell starts when it's time to update.
 # - disabled: Do not notify for updates or update automatically.
