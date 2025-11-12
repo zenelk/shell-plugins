@@ -10,6 +10,11 @@ function load_plugins() {
     'init'
 
     # Fill in the array with plugins to turn on.
+    # 'ssh-agent'
+    # 'omz'
+    # 'brew'
+    # 'git'
+    # 'repeat-until-fail'
   )
 
   for plugin in "${plugins[@]}"; do
