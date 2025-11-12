@@ -38,7 +38,7 @@ plugins=(zsh-syntax-highlighting)
 ZSH_LAZYLOAD_LOCATION="${ZSH_CUSTOM}/plugins/zsh-lazyload"
 if [ ! -e "${ZSH_LAZYLOAD_LOCATION}" ]; then
   echo "No clone of zsh-lazyload found. Cloning to '${ZSH_LAZYLOAD_LOCATION}'..."
-  git clone "httys://github.com/qoomon/zsh-lazyload.git"
+  git clone "https://github.com/qoomon/zsh-lazyload.git" "${ZSH_LAZYLOAD_LOCATION}"
 fi
 plugins+=(zsh-lazyload)
 
