@@ -10,11 +10,19 @@ function sr() {
   }
 
   function isRootSet() {
-    return ! [ -z "${ZK_CODE_ROOT}" ]
+    if ! [ -z "${ZK_CODE_ROOT}" ]; then
+      return 0
+    fi
+    
+    return 1
   }
 
   function isInteger() {
-    return [[ "${1}" =~ '^[0-9]+$' ]]
+    if [[ "${1}" =~ '^[0-9]+$' ]]; then
+      return 0
+    fi
+
+    return 1
   }
 
   function printUnsupportedArgumentError() {
