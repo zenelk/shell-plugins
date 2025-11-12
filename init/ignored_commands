@@ -1,0 +1,45 @@
+# ZTODO: Eventually, I'd like to be able to have plugins register their own ignored commands so that this list doesn't make an implicit dependency on individual plugins.
+
+# Git itself
+git
+
+# Git aliases
+ga
+gb
+gc
+gcan
+gcl
+gco
+gd
+gdc
+gf
+ggg
+gh
+gl
+glum
+gp
+gpu
+gs
+gu
+
+# File commands
+cat
+cp
+file
+mv
+open
+rm
+
+# Navigation commands
+cd
+cdup
+popd
+pushd
+
+# Redundant commands
+history
+
+# Temporary commands
+echo
+ls
+which
