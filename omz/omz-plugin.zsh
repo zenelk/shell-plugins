@@ -12,7 +12,7 @@ zstyle ':omz:update' mode auto
 ZSH_CUSTOM="${ZSH}/custom"
 ZSH_THEME_LOCATION="${ZSH_CUSTOM}/themes"
 if [ ! -d "${ZSH_THEME_LOCATION}" ]; then
-	echo "No theme location found. Creating one at '${ZSH_THEME_LOCATION}'..."
+  echo "No theme location found. Creating one at '${ZSH_THEME_LOCATION}'..."
   mkdir -p "${ZSH_THEME_LOCATION}"
 fi
 if [ ! -e "${ZSH_THEME_LOCATION}/git-taculous.zsh-theme" ]; then
