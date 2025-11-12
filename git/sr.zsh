@@ -223,14 +223,14 @@ function sr() {
   local orgs=($(statOrgs))
   local orgs_section_header='-----Orgs-----'
   local selected_org="$(produceSelectionIndex "${quick_select_org_index}" "${orgs_section_header}" "${orgs[@]}")"
-  if [ -z "${selectedOrg}" ]; then
+  if [ -z "${selected_org}" ]; then
     return 1
   fi
 
-  local repos="($(statRepos "${selected_org}")"
+  local repos=($(statRepos "${selected_org}"))
   local repo_section_header='\n-----Repos-----'
   local selected_repo="$(produceSelectionIndex "${quick_select_repo_index}" "${repo_section_header}" "${repos[@]}")"
-  if [ -z "${selectedRepo}" ]; then
+  if [ -z "${selected_repo}" ]; then
     return 1
   fi
 
