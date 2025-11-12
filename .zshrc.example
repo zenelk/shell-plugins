@@ -1,0 +1,17 @@
+# Defines the root where code is stored for use in the plugins.
+export ZK_CODE_ROOT="${HOME}/code"
+export ZK_PLUGINS_ROOT="${ZK_CODE_ROOT}/zenelk/shell-plugins"
+
+# ZTODO: I would really like to have colorized output for my own logs. Maybe a logging plugin?
+
+function load_plugins() {
+  local plugins=(
+    # ZTODO: Update list with real plugins when built out.
+    # 'init'
+  )
+
+  for plugin in "${plugins[@]}"; do
+    source "${ZK_PLUGINS_ROOT}/${plugin}/${plugin}-plugin.zsh"
+}
+
+load_plugins
