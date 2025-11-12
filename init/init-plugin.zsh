@@ -36,7 +36,7 @@ function zshaddhistory() {
     local ignored_commands=($(read_ignored_commands))
     local ignored_regex="^($(echo "${ignored_commands[@]}" | tr ' ' '|'))"
 
-    return [[ "${1}" =~ $ignored_regex ]]
+    [[ "${1}" =~ $ignored_regex ]]
   }
 
   emulate -L zsh
