@@ -6,12 +6,15 @@ export ZK_PLUGINS_ROOT="${ZK_CODE_ROOT}/zenelk/shell-plugins"
 
 function load_plugins() {
   local plugins=(
-    # ZTODO: Update list with real plugins when built out.
-    # 'init'
+    # Needs to be first if you're using `function_redefine` in the plugins.
+    'init'
+
+    # Fill in the array with plugins to turn on.
   )
 
   for plugin in "${plugins[@]}"; do
     source "${ZK_PLUGINS_ROOT}/${plugin}/${plugin}-plugin.zsh"
+  done
 }
 
 load_plugins
