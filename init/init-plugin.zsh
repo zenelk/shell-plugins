@@ -1,3 +1,5 @@
+INIT_LOAD_PATH="${0:a:h}"
+
 # Allows for functions to be reloaded when used like so:
 #   function_redefine foo
 #   function foo() { ... }
@@ -27,7 +29,7 @@ function zshaddhistory() {
         continue
       fi
       result+=("${line}")
-    done < "${0:a:h}/ignored_commands"
+    done < "${INIT_LOAD_PATH}/ignored_commands"
   }
 
   function is_ignored_command() {
