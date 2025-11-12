@@ -18,7 +18,7 @@ fi
 if [ ! -e "${ZSH_THEME_LOCATION}/git-taculous.zsh-theme" ]; then
   echo "Git-taculous theme not found. Downloading..."
   # ZTODO: I should fork / copy this and maintain it myself.
-  curl -so "${ZSH_THEME_LOCATION}/got-taculous.zsh-theme" 'https://raw.githubusercontent.com/brandon-fryslie/rad-plugins/refs/heads/master/git-taculous-theme/git-taculous.zsh-theme'
+  curl -so "${ZSH_THEME_LOCATION}/git-taculous.zsh-theme" 'https://raw.githubusercontent.com/brandon-fryslie/rad-plugins/refs/heads/master/git-taculous-theme/git-taculous.zsh-theme'
 fi
 ZSH_THEME='git-taculous'
 
