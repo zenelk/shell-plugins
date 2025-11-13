@@ -28,13 +28,17 @@ if ! command -v pyenv > /dev/null; then
   if [ "${input}" = 'y' ]; then
     echo "Installing latest '3.x.x' Python with Pyenv. This may take a while..."
     pyenv install 3
+    pyenv global 3
     echo "Install complete! Continuing loading the rest of the plugin..."
   else
     echo "Skipping Python install. Make sure default your Python version is set up!"
   fi
 fi
 
-lazyload pyenv python python3 pip pip3 venv -- '[[ -d "${PYENV_ROOT}/bin" ]] && export PATH="${PYENV_ROOT}/bin:${PATH}"; eval "$(pyenv init - zsh)"'
+
+# Do not `lazyload` this! Shadowing these executables messes with `venv`.
+# ZTODO: There should be a way to do this by maybe asking `pyenv` what the path is. This doesn't take long to run on shell start though.
+[[ -d "${PYENV_ROOT}/bin" ]] && export PATH="${PYENV_ROOT}/bin:${PATH}"; eval "$(pyenv init - zsh)"
 
 function_redefine venv
 function venv() {
