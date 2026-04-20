@@ -26,3 +26,69 @@ function function_redefine() {
     shift
   done
 }
+
+# ---
+# Logging
+# ---
+# All diagnostic output goes to stderr, keeping stdout clean for functional output.
+# Set ZK_COLOR_ENABLED=1 before sourcing plugins to enable colored log output.
+
+ZK_COLOR_RESET=$'\033[0m'
+ZK_COLOR_BLACK=$'\033[0;30m'
+ZK_COLOR_RED=$'\033[0;31m'
+ZK_COLOR_GREEN=$'\033[0;32m'
+ZK_COLOR_YELLOW=$'\033[0;33m'
+ZK_COLOR_BLUE=$'\033[0;34m'
+ZK_COLOR_MAGENTA=$'\033[0;35m'
+ZK_COLOR_CYAN=$'\033[0;36m'
+ZK_COLOR_WHITE=$'\033[0;37m'
+
+function_redefine _zk_log
+function _zk_log() {
+  local color="${1}"
+  local label="${2}"
+  shift 2
+
+  local use_echo_e=0
+  if [[ "${1}" == '-e' ]]; then
+    use_echo_e=1
+    shift
+  fi
+
+  local message=""
+  if [[ -n "${ZK_COLOR_ENABLED}" ]]; then
+    message="${color}[${label}] ${*}${ZK_COLOR_RESET}"
+  else
+    message="[${label}] ${*}"
+  fi
+
+  if (( use_echo_e )); then
+    echo -e "${message}" >&2
+  else
+    echo "${message}" >&2
+  fi
+}
+
+function_redefine zk_log_info
+function zk_log_info() {
+  _zk_log "${ZK_COLOR_CYAN}" "ZK-INFO" "$@"
+}
+
+function_redefine zk_log_warn
+function zk_log_warn() {
+  _zk_log "${ZK_COLOR_YELLOW}" "ZK-WARN" "$@"
+}
+
+function_redefine zk_log_error
+function zk_log_error() {
+  _zk_log "${ZK_COLOR_RED}" "ZK-ERROR" "$@"
+}
+
+function_redefine zk_log_debug
+function zk_log_debug() {
+  if [[ -z "${ZK_DEBUG}" ]]; then
+    return 0
+  fi
+
+  _zk_log "${ZK_COLOR_MAGENTA}" "ZK-DEBUG" "$@"
+}
