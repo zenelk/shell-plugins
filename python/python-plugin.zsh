@@ -68,9 +68,15 @@ function _python_lazy_exec() {
     return 1
   fi
 
-  # Remove wrappers after first successful initialization.
-  unfunction python python3 pip pip3 pydoc idle >/dev/null 2>&1
+  _python_remove_lazy_wrappers
+  rehash
   command "${command_name}" "$@"
+}
+
+function_redefine _python_remove_lazy_wrappers
+function _python_remove_lazy_wrappers() {
+  # Remove wrappers after first successful initialization so command resolution follows PATH.
+  unfunction python python3 pip pip3 pydoc idle >/dev/null 2>&1
 }
 
 function_redefine python
@@ -201,11 +207,16 @@ function _venv_activate() {
 
   echo "Activating Python virtual environment '${target_venv_name}'..."
 
+  _python_init || return 2
+
   local python_version="$(_python_version)"
   if ! source "${ZK_VENV_ROOT}/${python_version}/${target_venv_name}/bin/activate"; then
     echo "Failed to activate Python virtual environment '${target_venv_name}!"
     return 2
   fi
+
+  _python_remove_lazy_wrappers
+  rehash
 }
 
 function_redefine _venv_create
@@ -243,6 +254,8 @@ function _venv_deactivate() {
     echo "Failed to deactivate Python virtual environment '${current_venv_name}'!"
     return 1
   fi
+
+  rehash
 }
 
 function_redefine _venv_destroy
