@@ -37,16 +37,37 @@ function agent_start() {
   . "$env" >/dev/null
 }
 
+function_redefine agent_add_keys
+function agent_add_keys() {
+  emulate -L zsh
+  setopt localtraps
+
+  local interrupted=0
+  trap 'interrupted=1' INT
+
+  # This only handles keys with default names.
+  ssh-add
+  local ssh_add_exit=$?
+
+  trap - INT
+
+  if (( interrupted || ssh_add_exit == 130 )); then
+    echo "Call to ssh-add was cancelled. Continuing shell initialization..."
+    return 0
+  fi
+
+  return $ssh_add_exit
+}
+
 if ! agent_is_running; then
   agent_load_env
 fi
 
-# if your keys are not stored in `~/.ssh/id_rsa` or `~/.ssh/id_dsa`, you'll need to paste the proper path after `ssh-add`.
 if ! agent_is_running; then
   agent_start
-  ssh-add
+  agent_add_keys
 elif ! agent_has_keys; then
-  ssh-add
+  agent_add_keys
 fi
 
 unset env
