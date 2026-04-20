@@ -36,9 +36,72 @@ if ! command -v pyenv > /dev/null; then
 fi
 
 
-# Do not `lazyload` this! Shadowing these executables messes with `venv`.
-# ZTODO: There should be a way to do this by maybe asking `pyenv` what the path is. This doesn't take long to run on shell start though.
-[[ -d "${PYENV_ROOT}/bin" ]] && export PATH="${PYENV_ROOT}/bin:${PATH}"; eval "$(pyenv init - zsh)"
+# Initialize pyenv only when first needed, then remove wrappers so `venv` can own Python paths.
+function_redefine _python_init
+function _python_init() {
+  if [[ -n "${ZK_PYENV_INITIALIZED}" ]]; then
+    return 0
+  fi
+
+  if [[ -d "${PYENV_ROOT}/bin" ]]; then
+    export PATH="${PYENV_ROOT}/bin:${PATH}"
+  fi
+
+  if ! command -v pyenv >/dev/null 2>&1; then
+    echo "Command 'pyenv' is not available. Cannot initialize Python plugin!"
+    return 1
+  fi
+
+  # Skip rehash at shell startup. Shims can be rebuilt manually with `pyenv rehash` when needed.
+  # Many `pyenv` operations rehash automatically. If you install a tool with `pip` and it's not found in a venv,
+  # it probably means that you need to rehash.
+  eval "$(pyenv init - --no-rehash zsh)"
+  export ZK_PYENV_INITIALIZED=1
+}
+
+function_redefine _python_lazy_exec
+function _python_lazy_exec() {
+  local command_name="${1}"
+  shift
+
+  if ! _python_init; then
+    return 1
+  fi
+
+  # Remove wrappers after first successful initialization.
+  unfunction python python3 pip pip3 pydoc idle >/dev/null 2>&1
+  command "${command_name}" "$@"
+}
+
+function_redefine python
+function python() {
+  _python_lazy_exec python "$@"
+}
+
+function_redefine python3
+function python3() {
+  _python_lazy_exec python3 "$@"
+}
+
+function_redefine pip
+function pip() {
+  _python_lazy_exec pip "$@"
+}
+
+function_redefine pip3
+function pip3() {
+  _python_lazy_exec pip3 "$@"
+}
+
+function_redefine pydoc
+function pydoc() {
+  _python_lazy_exec pydoc "$@"
+}
+
+function_redefine idle
+function idle() {
+  _python_lazy_exec idle "$@"
+}
 
 function_redefine venv
 function venv() {
@@ -106,6 +169,7 @@ function _current_venv_name() {
 
 function_redefine _python_version
 function _python_version() {
+  _python_init || return 1
   python --version | cut -d ' ' -f 2
 }
 
