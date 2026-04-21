@@ -52,7 +52,7 @@ function agent_add_keys() {
   trap - INT
 
   if (( interrupted || ssh_add_exit == 130 )); then
-    echo "Call to ssh-add was cancelled. Continuing shell initialization..."
+    zk_log_warn "Call to ssh-add was cancelled. Continuing shell initialization."
     return 0
   fi
 

@@ -46,20 +46,20 @@ function gcb() {
   if [ -z "$selection" ]; then
     local i=1
     for branch in "${all_sorted[@]}"; do
-      echo "${i}) ${branch}"
+      echo "${i}) ${branch}" >&2
       i=$((i+1))
     done
 
     while [ -z "${selection}" ]; do
-      printf "Enter number to switch to [1-$branch_count]: "
+      printf "Enter number to switch to [1-$branch_count]: " >&2
       read input
       case "$input" in
         ''|*[!0-9]*)
-          echo "Not a number! Try again..."
+          echo "Not a number. Try again." >&2
           ;;
         *)
           if [ $input -lt 1 ] || [ $input -gt $branch_count ]; then
-            echo "Out of bounds! Try again..."
+            echo "Out of bounds. Try again." >&2
           else
             selection="$input"
           fi
@@ -67,7 +67,7 @@ function gcb() {
       esac
     done
   elif [[ ! $selection =~ '^[0-9]+$' ]] || [ $selection -lt 1 ] || [ $selection -gt $branch_count ]; then
-    echo "Quick checkout failed: Branch index out of bounds!"
+    zk_log_error "Quick checkout failed: Branch index out of bounds."
     return 1
   fi
 

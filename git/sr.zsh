@@ -5,15 +5,11 @@ function sr() {
   local quick_select_none='none'
   local quick_select_root='-'
 
-  function echoerr() {
-    echo $@ >&2
-  }
-
   function isRootSet() {
     if ! [ -z "${ZK_CODE_ROOT}" ]; then
       return 0
     fi
-    
+
     return 1
   }
 
@@ -26,7 +22,7 @@ function sr() {
   }
 
   function printUnsupportedArgumentError() {
-    echoerr "Unsupported argument '${1}' at position '${2}'!"
+    zk_log_error "Unsupported argument '${1}' at position '${2}'."
   }
 
   function validateArguments() {
@@ -46,7 +42,7 @@ function sr() {
       return 0
       ;;
     *)
-      echoerr "Invalid number of arguments!"
+      zk_log_error "Invalid number of arguments."
       # ZTODO: Make a usage function.
       return 1
       ;;
@@ -66,7 +62,7 @@ function sr() {
 
     for fd in "${ZK_CODE_ROOT}"/*; do
       if [ ! -d "${fd}" ]; then
-        echoerr "File is not a directory: '${fd}'!"
+        zk_log_error "File is not a directory: '${fd}'."
         continue
       fi
 
@@ -83,7 +79,7 @@ function sr() {
 
     for fd in "${org_path}"/*; do
       if [ ! -d "${fd}" ]; then
-        echoerr "File is not a directory: '${fd}'!"
+        zk_log_error "File is not a directory: '${fd}'."
         continue
       fi
 
@@ -95,7 +91,7 @@ function sr() {
   }
 
   function echoFormattedPromptLine() {
-    echoerr "  ${1}): ${2}"
+    echo "  ${1}): ${2}" >&2
   }
 
   function echoFormattedPromptArray() {
@@ -117,16 +113,16 @@ function sr() {
 
     while [ -z "${selection}" ]; do
       printf "Enter selection [1-${count}]: " >&2
-      
+
       read input
 
       case "${input}" in
       ''|*[!0-9]*)
-        echoerr "Not a number! Try again..."
+        echo "Not a number. Try again." >&2
         ;;
       *)
         if [ "${input}" -lt 1 ] || [ "${input}" -gt "${count}" ]; then
-          echoerr "Out of bounds! Try again..."
+          echo "Out of bounds. Try again." >&2
         else
           selection="${input}"
         fi
@@ -152,11 +148,11 @@ function sr() {
         return 0
       fi
 
-      echoerr -e "${section_header}"
+      echo -e "${section_header}" >&2
       echoFormattedPromptArray "${array[@]}"
       echo "$(readSelectionInputFromArray "${array[@]}")"
     elif isInteger "${quick_select_index}" && ([ "${quick_select_index}" -lt 1 ] || [ "${quick_select_index}" -gt "${count}" ]); then
-      echoerr "Quick select org index '${quick_select_index}' out of bounds '[1, ${count}]!"
+      zk_log_error "Quick select org index '${quick_select_index}' out of bounds '[1, ${count}]."
       return 1
     else
       echo "${array["${quick_select_index}"]}"
@@ -184,12 +180,12 @@ function sr() {
 
   # ZTODO: Tie usage into this error.
   if ! isRootSet; then
-    echoerr "Environment variable 'ZK_CODE_ROOT' is not defined!"
+    zk_log_error "Environment variable 'ZK_CODE_ROOT' is not defined."
     return 1
   fi
 
   if ! validateArguments "${@}"; then
-    echoerr "Failed to validate arguments! Received: '${@}'"
+    zk_log_error "Invalid arguments: '${@}'."
     return 1
   fi
 
@@ -203,20 +199,20 @@ function sr() {
     if attempt_regex_lookup "${@}"; then
       return 0
     else
-      echoerr "Could not find a repository matching pattern: '${1}'!"
+      zk_log_error "Could not find a repository matching pattern: '${1}'."
       return 1
     fi
   fi
 
   local quick_select_org_index="$(parseQuickSelectArgument "${1}")"
   if [ -z "${quick_select_org_index}" ]; then
-    echo "Index '${1}' not found!"
+    zk_log_error "Index '${1}' not found."
     return 1
   fi
 
   local quick_select_repo_index="$(parseQuickSelectArgument "${2}")"
   if [ -z "${quick_select_repo_index}" ]; then
-    echo "Index '${2}' not found!"
+    zk_log_error "Index '${2}' not found."
     return 1
   fi
 

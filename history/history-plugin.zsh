@@ -25,17 +25,17 @@ function zshaddhistory() {
   emulate -L zsh
 
   if ! whence ${${(z)1}[1]} >| /dev/null; then
-    echo "[ZK] Command does not exist on the system. Not adding to history."
+    zk_log_debug "Command does not exist on the system. Not adding to history."
     return 1
   fi
 
   if [[ "${1}" =~ "^[[:space:]]+" ]]; then
-    echo "[ZK] Command starts with whitespace. Not adding to history."
+    zk_log_debug "Command starts with whitespace. Not adding to history."
     return 1
   fi
 
   if is_ignored_command "${1}"; then
-    echo "[ZK] Command is in ignore list. Not adding to history."
+    zk_log_debug "Command is in ignore list. Not adding to history."
     return 1
   fi
 

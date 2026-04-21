@@ -1,7 +1,7 @@
 export ZSH="${HOME}/.oh-my-zsh"
 
 if [ ! -d "${ZSH}" ]; then
-  echo "Oh My Zsh is not installed! Running the installer script..."
+  zk_log_status "Oh My Zsh is not installed! Running the installer script..."
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
@@ -17,11 +17,11 @@ zstyle ':omz:update' mode auto
 ZSH_CUSTOM="${ZSH}/custom"
 ZSH_THEME_LOCATION="${ZSH_CUSTOM}/themes"
 if [ ! -d "${ZSH_THEME_LOCATION}" ]; then
-  echo "No theme location found. Creating one at '${ZSH_THEME_LOCATION}'..."
+  zk_log_status "No theme location found. Creating one at '${ZSH_THEME_LOCATION}'..."
   mkdir -p "${ZSH_THEME_LOCATION}"
 fi
 if [ ! -e "${ZSH_THEME_LOCATION}/git-taculous.zsh-theme" ]; then
-  echo "Git-taculous theme not found. Downloading..."
+  zk_log_status "Git-taculous theme not found. Downloading..."
   # ZTODO: I should fork / copy this and maintain it myself.
   curl -so "${ZSH_THEME_LOCATION}/git-taculous.zsh-theme" 'https://raw.githubusercontent.com/brandon-fryslie/rad-plugins/refs/heads/master/git-taculous-theme/git-taculous.zsh-theme'
 fi
@@ -32,7 +32,7 @@ ZSH_THEME='git-taculous'
 
 ZSH_SYNTAX_HIGHLIGHTING_LOCATION="${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
 if [ ! -e "${ZSH_SYNTAX_HIGHLIGHTING_LOCATION}" ]; then
-  echo "No clone of zsh-syntax-highlighting found. Cloning to '${ZSH_SYNTAX_HIGHLIGHTING_LOCATION}'..."
+  zk_log_status "No clone of zsh-syntax-highlighting found. Cloning to '${ZSH_SYNTAX_HIGHLIGHTING_LOCATION}'..."
   git clone "https://github.com/zsh-users/zsh-syntax-highlighting.git" "${ZSH_SYNTAX_HIGHLIGHTING_LOCATION}"
 fi
 plugins=(zsh-syntax-highlighting)
@@ -42,7 +42,7 @@ plugins=(zsh-syntax-highlighting)
 
 ZSH_LAZYLOAD_LOCATION="${ZSH_CUSTOM}/plugins/zsh-lazyload"
 if [ ! -e "${ZSH_LAZYLOAD_LOCATION}" ]; then
-  echo "No clone of zsh-lazyload found. Cloning to '${ZSH_LAZYLOAD_LOCATION}'..."
+  zk_log_status "No clone of zsh-lazyload found. Cloning to '${ZSH_LAZYLOAD_LOCATION}'..."
   git clone "https://github.com/qoomon/zsh-lazyload.git" "${ZSH_LAZYLOAD_LOCATION}"
 fi
 plugins+=(zsh-lazyload)

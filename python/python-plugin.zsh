@@ -5,33 +5,34 @@ ZK_VENV_ROOT="${HOME}/.venv"
 if ! command -v pyenv > /dev/null; then
   local input
 
-  printf "Pyenv is not installed and is required for the 'python' plugin! Do you want to install? [y/n] "
+  printf "Pyenv is not installed and is required for the 'python' plugin! Do you want to install? [y/n] " >&2
   read input
 
   if [ "${input}" != 'y' ]; then
-    echo "Cancelling loading the plugin!"
+    zk_log_status "Cancelling loading the plugin."
     return 1
   fi
 
   # ZTODO: This won't work for Arch.
-  echo "Running 'brew install pyenv'..."
+  zk_log_status "Running 'brew install pyenv'..."
   brew install pyenv
 
-  if ! command -v pyenv; then
-    echo "Could not verify Pyenv installation! Cancelling loading the plugin!"
+  if ! command -v pyenv >/dev/null; then
+    zk_log_error "Could not verify Pyenv installation. Cancelling loading the plugin."
     return 1
   fi
 
-  printf "Pyenv verified. Do you want to install latest '3.x.x' Python? [y/n] "
+  zk_log_success "Pyenv installed successfully."
+  printf "Do you want to install latest '3.x.x' Python? [y/n] "
   read input
 
   if [ "${input}" = 'y' ]; then
-    echo "Installing latest '3.x.x' Python with Pyenv. This may take a while..."
+    zk_log_status "Installing latest '3.x.x' Python with Pyenv. This may take a while..."
     pyenv install 3
     pyenv global 3
-    echo "Install complete! Continuing loading the rest of the plugin..."
+    zk_log_success "Install complete. Continuing loading the rest of the plugin..."
   else
-    echo "Skipping Python install. Make sure default your Python version is set up!"
+    zk_log_status "Skipping Python install. Make sure default your Python version is set up."
   fi
 fi
 
@@ -48,7 +49,7 @@ function _python_init() {
   fi
 
   if ! command -v pyenv >/dev/null 2>&1; then
-    echo "Command 'pyenv' is not available. Cannot initialize Python plugin!"
+    zk_log_error "Command 'pyenv' is not available. Cannot initialize Python plugin."
     return 1
   fi
 
@@ -112,16 +113,16 @@ function idle() {
 function_redefine venv
 function venv() {
   function _venv_usage() {
-    echo "Usage: venv [verb] [options]"
-    echo "  [verb] (default: list) is one of:"
-    echo "    activate   (a)"
-    echo "    create     (c)"
-    echo "    deactivate (da)"
-    echo "    destroy    (d)"
-    echo "    help       (h)"
-    echo "    list       (l)"
-    echo "    recreate   (r)"
-    echo "  [options] are arguments defined in their respective verbs"
+    zk_log_usage "Usage: venv <verb> [options]"
+    zk_log_usage "  <verb> (default: list) is one of:"
+    zk_log_usage "    activate   (a)"
+    zk_log_usage "    create     (c)"
+    zk_log_usage "    deactivate (da)"
+    zk_log_usage "    destroy    (d)"
+    zk_log_usage "    help       (h)"
+    zk_log_usage "    list       (l)"
+    zk_log_usage "    recreate   (r)"
+    zk_log_usage "  [options] are arguments defined in their respective verbs"
   }
 
   # This is a ZSH-specific associative array. The keys must exactly match when accessing values, including quotation. Careful!
@@ -180,38 +181,38 @@ function _python_version() {
 }
 
 function_redefine _venv_deactivate_if_inside
-function _venv_decactivate_if_inside() {
+function _venv_deactivate_if_inside() {
   if ! _inside_venv; then
     return 0
   fi
 
   local current_venv_name="$(_current_venv_name)"
-  echo "Already inside Python virtual environment '${current_venv_name}'. Deactivating..."
+  zk_log_status "Already inside Python virtual environment '${current_venv_name}'. Deactivating..."
   _venv_deactivate
 }
 
 function_redefine _venv_activate
 function _venv_activate() {
   function _venv_activate_usage() {
-    echo "Usage: venv activate VENV_NAME"
+    zk_log_usage "Usage: venv activate <venv_name>"
   }
 
-  _venv_decactivate_if_inside
+  _venv_deactivate_if_inside
 
   local target_venv_name="${1}"
   if [ -z "${target_venv_name}" ]; then
-    echo "Missing target virtual environment name!"
+    zk_log_error "Missing target virtual environment name."
     _venv_activate_usage
     return 1
   fi
 
-  echo "Activating Python virtual environment '${target_venv_name}'..."
+  zk_log_status "Activating Python virtual environment '${target_venv_name}'..."
 
   _python_init || return 2
 
   local python_version="$(_python_version)"
   if ! source "${ZK_VENV_ROOT}/${python_version}/${target_venv_name}/bin/activate"; then
-    echo "Failed to activate Python virtual environment '${target_venv_name}!"
+    zk_log_error "Failed to activate Python virtual environment '${target_venv_name}."
     return 2
   fi
 
@@ -222,12 +223,12 @@ function _venv_activate() {
 function_redefine _venv_create
 function _venv_create() {
   function _venv_create_usage() {
-    echo "Usage: venv create VENV_NAME"
+    zk_log_usage "Usage: venv create <venv_name>"
   }
 
   local target_venv_name="${1}"
   if [ -z "${target_venv_name}" ]; then
-    echo "Missing target virtual environment name!"
+    zk_log_error "Missing target virtual environment name."
     _venv_create_usage
     return 1
   fi
@@ -235,13 +236,13 @@ function _venv_create() {
   local python_version="$(_python_version)"
   local venv_path="${ZK_VENV_ROOT}/${python_version}/${target_venv_name}"
   if [ -d "${venv_path}" ]; then
-    echo "Python virtual environment '${target_venv_name}' already exists!"
+    zk_log_success "Python virtual environment '${target_venv_name}' already exists."
     return 2
   fi
 
-  echo "Creating Python virtual environment '${target_venv_name}'..."
+  zk_log_status "Creating Python virtual environment '${target_venv_name}'..."
   if ! python -m venv "${venv_path}"; then
-    echo "Failed to create Python virtual environment '${target_venv_name}'!"
+    zk_log_error "Failed to create Python virtual environment '${target_venv_name}'."
     return 3
   fi
 }
@@ -249,9 +250,9 @@ function _venv_create() {
 function_redefine _venv_deactivate
 function _venv_deactivate() {
   local current_venv_name="$(_current_venv_name)"
-  echo "Deactivating Python virtual environment '${current_venv_name}'..."
+  zk_log_status "Deactivating Python virtual environment '${current_venv_name}'..."
   if ! deactivate; then
-    echo "Failed to deactivate Python virtual environment '${current_venv_name}'!"
+    zk_log_error "Failed to deactivate Python virtual environment '${current_venv_name}'."
     return 1
   fi
 
@@ -261,12 +262,12 @@ function _venv_deactivate() {
 function_redefine _venv_destroy
 function _venv_destroy() {
   function _venv_destroy_usage() {
-    echo "Usage: venv destroy VENV_NAME"
+    zk_log_usage "Usage: venv destroy <venv_name>"
   }
 
   local target_venv_name="${1}"
   if [ -z "${target_venv_name}" ]; then
-    echo "Missing target virtual environment name!"
+    zk_log_error "Missing target virtual environment name."
     _venv_destroy_usage
     return 1
   fi
@@ -274,9 +275,9 @@ function _venv_destroy() {
   local python_version="$(_python_version)"
   local venv_path="${ZK_VENV_ROOT}/${python_version}/${target_venv_name}"
 
-  echo "Destroying Python virtual environment: '${target_venv_name}'..."
+  zk_log_status "Destroying Python virtual environment: '${target_venv_name}'..."
   if ! rm -rf "${venv_path}"; then
-    echo "Failed to destroy Python virutal environment '${target_venv_name}'!"
+    zk_log_error "Failed to destroy Python virtual environment '${target_venv_name}'."
     return 3
   fi
 }
@@ -285,7 +286,7 @@ function_redefine _venv_list
 function _venv_list() {
   local python_version="$(_python_version)"
   local venvs_path="${ZK_VENV_ROOT}/${python_version}"
-  echo "Python virtual environments for Python version '${python_version}':"
+  zk_log_status "Python virtual environments for Python version '${python_version}':"
   # ZTODO: There is most certainly a better way to do this.
   for venv in $(ls -1 "${venvs_path}" | grep -v -e '^\.$' -e '^\.\.$'); do
     echo "  ${venv}"
@@ -296,12 +297,12 @@ function_redefine _venv_recreate
 function _venv_recreate() {
   # ZTODO: For when I get reloading working again, do these usage functions get swapped out as expected?
   function _venv_recreate_usage() {
-    echo "Usage: venv recreate VENV_NAME"
+    zk_log_usage "Usage: venv recreate <venv_name>"
   }
 
   local target_venv_name="${1}"
   if [ -z "${target_venv_name}" ]; then
-    echo "Missing target virtual environment name!"
+    zk_log_error "Missing target virtual environment name."
     _venv_recreate_usage
     return 1
   fi

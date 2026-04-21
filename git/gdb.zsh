@@ -1,8 +1,8 @@
-# ZTODO: Should handle mulitple remotes.
+# ZTODO: Should handle multiple remotes.
 function_redefine gdb
 function gdb() {
   if [ -z "$1" ]; then
-    echo "Branch name is required!"
+    zk_log_error "Branch name is required."
     return
   fi
   git branch -D "$1"

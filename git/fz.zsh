@@ -8,7 +8,7 @@ function fz() {
       echo "${git_dir}"
     else
       # ZTODO: I'm pretty sure this will make the finding the `.gitignore` file go haywire since there's not a code I'm checking.
-      echo "Not inside a Git repository!"
+      zk_log_error "Not inside a Git repository."
     fi
   }
 
@@ -30,7 +30,7 @@ function fz() {
         exclude_options+=("--exclude=${line}")
       done < "${gitignore_file}"
     else
-      echo "No .gitignore file found!" >&2
+      zk_log_warn "No .gitignore file found."
     fi
 
     echo "${exclude_options[@]}"
