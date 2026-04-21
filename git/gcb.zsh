@@ -67,7 +67,7 @@ function gcb() {
       esac
     done
   elif [[ ! $selection =~ '^[0-9]+$' ]] || [ $selection -lt 1 ] || [ $selection -gt $branch_count ]; then
-    zk_log_error "Quick checkout failed: Branch index out of bounds."
+    zk_log_error "Quick checkout failed. Branch index out of bounds."
     return 1
   fi
 
