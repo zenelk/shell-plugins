@@ -26,7 +26,7 @@ Messages for the user that don't need a response to continue, including on exit.
 |---|---|---|---|---|
 | Success | Green | No | `zk_log_success` | Completion of a process, or state already matches expected |
 | Warning | Yellow | No | `zk_log_warn` | Non-fatal, diversion from the happy path |
-| Error | Red | No | `zk_log_error` | Fatal, cannot reasonable continue |
+| Error | Red | No | `zk_log_error` | Fatal, cannot reasonably continue |
 | Status | Cyan | No | `zk_log_status` | Progress or state change during execution |
 | Debug | Dim | `ZK_DEBUG` | `zk_log_debug` | Diagnostics, invisible by default |
 | Usage | None | No | `zk_log_usage` | POSIX-style synopsis format |
