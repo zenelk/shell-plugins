@@ -79,7 +79,7 @@ function sr() {
 
     for fd in "${org_path}"/*; do
       if [ ! -d "${fd}" ]; then
-        zk_log_error "File is not a directory: '${fd}'."
+        zk_log_warn "File is not a directory: '${fd}'."
         continue
       fi
 

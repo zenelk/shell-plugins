@@ -1,7 +1,7 @@
 export ZSH="${HOME}/.oh-my-zsh"
 
 if [ ! -d "${ZSH}" ]; then
-  zk_log_status "Oh My Zsh is not installed! Running the installer script..."
+  zk_log_status "Oh My Zsh is not installed. Running the installer script..."
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
