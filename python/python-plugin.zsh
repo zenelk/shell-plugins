@@ -2,7 +2,7 @@ export PYENV_ROOT="${HOME}/.pyenv"
 
 ZK_VENV_ROOT="${HOME}/.venv"
 
-if ! command -v pyenv > /dev/null; then
+if ! command -v pyenv >/dev/null; then
   local input
 
   printf "Pyenv is not installed and is required for the 'python' plugin! Do you want to install? [y/n] " >&2
