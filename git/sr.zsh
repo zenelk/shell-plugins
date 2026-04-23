@@ -1,5 +1,8 @@
 # ZTODO: Needs a style pass for consistency.
 
+# Defines the root of the search context.
+ZK_CODE_ROOT="${HOME}/code"
+
 function_redefine
 function sr() {
   local quick_select_none='none'
