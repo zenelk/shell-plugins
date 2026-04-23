@@ -24,3 +24,7 @@ function gdb() {
   git branch -D "${branch}"
   git push origin ":${branch}"
 }
+
+if (( $+functions[compdef] )) && (( $+functions[_git] )); then
+  compdef _git gdb=git-branch
+fi
