@@ -5,6 +5,22 @@ function gdb() {
     zk_log_error "Branch name is required."
     return
   fi
-  git branch -D "${1}"
-  git push origin ":${1}"
+
+  local branch="${1}"
+  local confirmation
+
+  printf "Delete local and remote branch '%s'? [y/N] " "${branch}" >&2
+  read -r confirmation
+
+  case "${confirmation}" in
+    y|Y|yes|YES)
+      ;;
+    *)
+      echo "Deletion cancelled." >&2
+      return
+      ;;
+  esac
+
+  git branch -D "${branch}"
+  git push origin ":${branch}"
 }
