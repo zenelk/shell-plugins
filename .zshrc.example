@@ -1,25 +1,55 @@
-# Defines the root where code is stored for use in the plugins.
-export ZK_CODE_ROOT="${HOME}/code"
-export ZK_PLUGINS_ROOT="${ZK_CODE_ROOT}/zenelk/shell-plugins"
+# Drop this into your `~/.zshrc`, edit the options, and restart the shell.
+# Complex plugins should walk you through initialization.
 
-# ZTODO: I would really like to have colorized output for my own logs. Maybe a logging plugin?
+# Defines the location of the Git repository where plugins are located.
+# ZK_PLUGINS_ROOT="${HOME}/code/zenelk/shell-plugins"
 
-function load_plugins() {
-  local plugins=(
-    # Needs to be first if you're using `function_redefine` in the plugins.
-    'init'
+# Enable for colorized output.
+# ZK_COLOR_ENABLED=1
 
-    # Fill in the array with plugins to turn on.
-    # 'ssh-agent'
-    # 'omz'
-    # 'brew'
-    # 'git'
-    # 'repeat-until-fail'
-  )
+# Enable for debug output.
+# ZK_DEBUG=1
 
-  for plugin in "${plugins[@]}"; do
+# Defines the plugins to be loaded.
+# This may be changed live by updating the list and running `zk_load_plugins`.
+# Live unloading of plugins is not supported.
+# ZK_PLUGINS=(
+  # Needs to be first if you're using `function_redefine` in the plugins.
+  # 'init'
+
+  # Convention is that this loads first, then subsequent plugins append to the list.
+  # 'history'
+
+  # Fill in the array with plugins to turn on.
+  # 'ssh-agent'
+  # 'omz'
+  # 'brew'
+  # 'git'
+  # 'python'
+  # 'repeat-until-fail'
+  # 'ssh-agent'
+  # 'vscode'
+# )
+
+function zk_load_plugins() {
+  if [[ -z "${ZK_PLUGINS_ROOT}" ]]; then
+    echo "Unable to load plugins. ZK_PLUGINS_ROOT is not defined."
+    return 1
+  fi
+
+  if [[ ! -v ZK_PLUGINS ]]; then
+    echo "Unable to load plugins. ZK_PLUGINS is not defined."
+    return 2
+  fi
+
+  if (( ${#ZK_PLUGINS} == 0 )); then
+    echo "Unable to load plugins. ZK_PLUGINS is empty."
+    return 3
+  fi
+
+  for plugin in "${ZK_PLUGINS[@]}"; do
     source "${ZK_PLUGINS_ROOT}/${plugin}/${plugin}-plugin.zsh"
   done
 }
 
-load_plugins
+zk_load_plugins
