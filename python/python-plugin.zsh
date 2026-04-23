@@ -57,7 +57,7 @@ function _python_init() {
   # Many `pyenv` operations rehash automatically. If you install a tool with `pip` and it's not found in a venv,
   # it probably means that you need to rehash.
   eval "$(pyenv init - --no-rehash zsh)"
-  export ZK_PYENV_INITIALIZED=1
+  ZK_PYENV_INITIALIZED=1
 }
 
 function_redefine _python_lazy_exec
