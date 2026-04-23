@@ -47,7 +47,7 @@ function glum() {
 
   zk_log_status "Pulling upstream/${upstream_branch} into ${current_branch}..."
 
-  git pull upstream "${upstream_branch}"
+  git pull upstream "${upstream_branch}" --no-edit
   local pull_exit="${?}"
 
   if [ "${pull_exit}" -ne 0 ]; then
