@@ -1,44 +1,55 @@
-INIT_LOAD_PATH="${0:a:h}"
+_ZK_INIT_LOAD_PATH="${0:a:h}"
 
-# Hook for tying into ZSH process for adding to history. Does not add failed commands and specified commands to history.
-# ZTODO: This is not working as expected after rad-shell removal and needs some love to register ignored commands.
-function_redefine zshaddhistory
-function zshaddhistory() {
-  function read_ignored_commands() {
-    local result=()
+# Array of commands to exclude from history in addition to those listed in ignored_commands.
+# Plugins loaded before this one may pre-populate this array.
+(( ${+ZK_HISTORY_IGNORED_COMMANDS} )) || ZK_HISTORY_IGNORED_COMMANDS=()
 
-    while IFS= read -r line; do
-      if [[ "${line}" =~ '^#' ]] || [ -z "${line}" ]; then
-        continue
-      fi
-      result+=("${line}")
-    done < "${INIT_LOAD_PATH}/ignored_commands"
-  }
+# Register one or more commands to be excluded from history at runtime.
+# Usage: zk_history_register_ignored <command> [<command> ...]
+function_redefine zk_history_register_ignored
+function zk_history_register_ignored() {
+  ZK_HISTORY_IGNORED_COMMANDS+=("$@")
+}
 
-  function is_ignored_command() {
-    local ignored_commands=($(read_ignored_commands))
-    local ignored_regex="^($(echo "${ignored_commands[@]}" | tr ' ' '|'))"
+function_redefine _zk_history_read_ignores_from_file
+function _zk_history_read_ignores_from_file() {
+  while IFS= read -r line; do
+    if [[ "${line}" =~ '^#' ]] || [[ -z "${line}" ]]; then
+      continue
+    fi
+    print -- "${line}"
+  done < "${_ZK_INIT_LOAD_PATH}/ignored_commands"
+}
 
-    [[ "${1}" =~ $ignored_regex ]]
-  }
+function_redefine _zk_history_is_ignored
+function _zk_history_is_ignored() {
+  local -a all_ignored
+  all_ignored=($(_zk_history_read_ignores_from_file) "${ZK_HISTORY_IGNORED_COMMANDS[@]}")
 
-  emulate -L zsh
-
-  if ! whence ${${(z)1}[1]} >| /dev/null; then
-    zk_log_debug "Command does not exist on the system. Not adding to history."
+  if (( ${#all_ignored} == 0 )); then
     return 1
   fi
+  local ignored_regex="^($(echo "${all_ignored[@]}" | tr ' ' '|'))"
+  [[ "${1}" =~ $ignored_regex ]]
+}
+
+# Hook into zsh's history system. Should not be invoked directly.
+function_redefine zshaddhistory
+function zshaddhistory() {
+  emulate -L zsh
 
   if [[ "${1}" =~ "^[[:space:]]+" ]]; then
     zk_log_debug "Command starts with whitespace. Not adding to history."
     return 1
   fi
 
-  if is_ignored_command "${1}"; then
-    zk_log_debug "Command is in ignore list. Not adding to history."
+  if ! whence ${${(z)1}[1]} >|/dev/null; then
+    zk_log_debug "Command does not exist on the system. Not adding to history."
     return 1
   fi
 
-  print -sr -- "${1%%$'\n'}"
-  fc -p
+  if _zk_history_is_ignored "${1}"; then
+    zk_log_debug "Command is in ignore list. Not adding to history."
+    return 1
+  fi
 }
