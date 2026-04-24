@@ -25,6 +25,7 @@
   # 'omz'
   # 'brew'
   # 'git'
+  # 'cdup'
   # 'python'
   # 'repeat-until-fail'
   # 'ssh-agent'
